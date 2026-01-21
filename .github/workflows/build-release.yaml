@@ -1,0 +1,93 @@
+name: macOS Release Build
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Build macOS application
+        run: |
+          # Build the app in Release mode
+          xcodebuild -scheme ShaderWallpaper \
+            -configuration Release \
+            -derivedDataPath ./build \
+            -destination 'platform=macOS' \
+            clean build
+          
+          # Find the built app
+          APP_PATH=$(find ./build/Build/Products/Release -name "*.app" -maxdepth 1 | head -n 1)
+          
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: Could not find built .app"
+            exit 1
+          fi
+          
+          echo "Found app at: $APP_PATH"
+          
+          # Create distribution directory
+          mkdir -p dist
+          
+          # Copy the app to dist
+          cp -R "$APP_PATH" dist/
+          
+          # Create a DMG for easier distribution
+          APP_NAME=$(basename "$APP_PATH")
+          hdiutil create -volname "ShaderWallpaper" \
+            -srcfolder dist/"$APP_NAME" \
+            -ov -format UDZO \
+            dist/ShaderWallpaper-${{ github.ref_name }}.dmg
+
+      - name: Create ZIP archive
+        run: |
+          cd dist
+          APP_NAME=$(ls *.app | head -n 1)
+          zip -r ShaderWallpaper-${{ github.ref_name }}.zip "$APP_NAME"
+          cd ..
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            dist/ShaderWallpaper-${{ github.ref_name }}.dmg
+            dist/ShaderWallpaper-${{ github.ref_name }}.zip
+          body: |
+            ## ShaderWallpaper ${{ github.ref_name }}
+            
+            ### Installation
+            1. Download either the DMG or ZIP file
+            2. Open the DMG or extract the ZIP
+            3. Drag ShaderWallpaper.app to your Applications folder
+            4. Open System Settings → General → Login Items
+            5. Add ShaderWallpaper to auto-start on login
+            
+            ### Features 
+            - Menu bar control with hide/show toggle
+            - 1 built-in shaders: Balatro, Soon
+            - Easy shader switching
+            - Lightweight and efficient
+            
+            ### Usage
+            - Click the menu bar icon (waveform) to access controls
+            - Select Shader to switch between effects
+            - Hide/Show to temporarily disable the wallpaper
+            - Quit to exit the application
