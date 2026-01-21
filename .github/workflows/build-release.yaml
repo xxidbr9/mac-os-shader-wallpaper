@@ -61,12 +61,22 @@ jobs:
             -ov -format UDZO \
             dist/ShaderWallpaper-${{ github.ref_name }}.dmg
 
+      - name: Debug dist directory
+        run: ls -la dist
+
+
       - name: Create ZIP archive
         run: |
-          cd dist
-          APP_NAME=$(ls *.app | head -n 1)
-          zip -r ShaderWallpaper-${{ github.ref_name }}.zip "$APP_NAME"
-          cd ..
+          APP_PATH=$(find dist -maxdepth 1 -name "*.app" | head -n 1)
+
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: No .app found in dist directory"
+            ls -la dist
+            exit 1
+          fi
+
+          zip -r "dist/ShaderWallpaper-${{ github.ref_name }}.zip" "$APP_PATH"
+
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
