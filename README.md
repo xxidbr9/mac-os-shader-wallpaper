@@ -63,7 +63,8 @@ Look for the **waveform icon** (≋) in your menu bar:
 ## 🎨 Shader Previews
 
 ### Balatro (Original)
-Swirling abstract art with rich colors and smooth animations, from my own port ShaderToys :
+Swirling abstract art with rich colors and smooth animations, from my own port ShaderToys:
+
 [https://www.shadertoy.com/view/XXtBRr](https://www.shadertoy.com/view/XXtBRr)
 
 ### Soon
