@@ -8,6 +8,7 @@ A beautiful, GPU-accelerated live wallpaper for macOS with multiple shader effec
 
 - 🎨 **1 Built-in Shaders**: Switch between stunning visual effects
   - **Balatro** - Original swirling abstract art (by [localthunk](https://www.playbalatro.com))
+  - **Other** - My port shader from the internet
   - **SOON** - Any other shader port will be soon updated
 
 - 🖱️ **Menu Bar Control** - Easy access to all features
