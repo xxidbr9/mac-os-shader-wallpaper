@@ -32,6 +32,19 @@ enum ShaderType: String, CaseIterable {
         case .heavenly: return "heavenlyShader"
         }
     }
+
+    static let storageKey = "selectedShader"
+
+    static var persistedSelection: ShaderType {
+        guard
+            let rawValue = UserDefaults.standard.string(forKey: storageKey),
+            let shader = ShaderType(rawValue: rawValue)
+        else {
+            return ShaderType.allCases[0]
+        }
+
+        return shader
+    }
 }
 
 struct Uniforms {
@@ -46,7 +59,7 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
     var commandQueue: MTLCommandQueue!
     var pipelineState: MTLRenderPipelineState!
     var startTime: Date!
-    var currentShader: ShaderType = .balatro
+    var currentShader: ShaderType = ShaderType.persistedSelection
     
     init?(metalView: MTKView) {
         super.init()
@@ -62,13 +75,11 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
         
         startTime = Date()
         
-        // Load initial shader
+        // Load the persisted shader when available, otherwise fall back to index 0.
         loadShader(currentShader, for: metalView)
     }
     
     func loadShader(_ shaderType: ShaderType, for metalView: MTKView) {
-        currentShader = shaderType
-        
         guard let library = try? device.makeDefaultLibrary(bundle: Bundle.main),
               let vertexFunction = library.makeFunction(name: "vertexShader"),
               let fragmentFunction = library.makeFunction(name: shaderType.shaderName) else {
@@ -83,6 +94,8 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
         
         do {
             pipelineState = try device.makeRenderPipelineState(descriptor: pipelineDescriptor)
+            currentShader = shaderType
+            UserDefaults.standard.set(shaderType.rawValue, forKey: ShaderType.storageKey)
             print("Loaded shader: \(shaderType.rawValue)")
         } catch {
             print("Failed to create pipeline state: \(error)")
