@@ -6,16 +6,25 @@ A beautiful, GPU-accelerated live wallpaper for macOS with multiple shader effec
 
 ## ✨ Features
 
-- 🎨 **1 Built-in Shaders**: Switch between stunning visual effects
-  - **Balatro** - Original swirling abstract art (by [localthunk](https://www.playbalatro.com))
-  - **Other** - My port shader from the internet
-  - **SOON** - Any other shader port will be soon updated
-
+- 🎨 **8 Built-in Shaders**: Switch between stunning visual effects
 - 🖱️ **Menu Bar Control** - Easy access to all features
 - 👁️ **Hide/Show Toggle** - Temporarily disable the wallpaper
 - ⚡ **GPU Accelerated** - Smooth 60 FPS using Metal
 - 🔋 **Efficient** - Minimal CPU usage, runs at desktop level
 - 🚀 **Auto-start** - Optional launch on login
+
+## 🎨 Available Shaders
+
+| Shader | Preview | Description | Source |
+|--------|---------|-------------|--------|
+| Balatro (Original) | ![Balatro](.github/screenshots/balatro.png) | Swirling abstract art with rich colors and smooth animations | [ShaderToy](https://www.shadertoy.com/view/XXtBRr) |
+| Multi Box | ![Multi Box](.github/screenshots/multibox.png) | Animated geometric boxes with dynamic patterns | Custom |
+| Tiles | ![Tiles](.github/screenshots/tiles.png) | Colorful tile patterns with flowing transitions | Custom |
+| Pillars | ![Pillars](.github/screenshots/pillars.png) | Vertical pillar structures with wave motion | Custom |
+| Marbles | ![Marbles](.github/screenshots/marbles.png) | Marble-like swirls and patterns | Custom |
+| Black Hole | ![Black Hole](.github/screenshots/blackhole.png) | Cosmic black hole effect with gravitational distortion | Custom |
+| Shiny Color | ![Shiny Color](.github/screenshots/shiny.png) | Vibrant shiny color gradients | Custom |
+| Heavenly | ![Heavenly](.github/screenshots/heavenly.png) | Ethereal heavenly glow effects | Custom |
 
 ## 📥 Installation
 
@@ -53,24 +62,13 @@ A beautiful, GPU-accelerated live wallpaper for macOS with multiple shader effec
 Look for the **waveform icon** (≋) in your menu bar:
 
 - **Hide/Show Wallpaper** - Toggle visibility (⌘H)
-- **Select Shader** - Choose from 4 different effects
+- **Select Shader** - Choose from 8 different effects
 - **Quit** - Exit the application (⌘Q)
 
 ### Keyboard Shortcuts
 
 - `⌘H` - Hide/Show wallpaper
 - `⌘Q` - Quit application
-
-## 🎨 Shader Previews
-
-### Balatro (Original)
-Swirling abstract art with rich colors and smooth animations, from my own port ShaderToys:
-
-[https://www.shadertoy.com/view/XXtBRr](https://www.shadertoy.com/view/XXtBRr)
-
-### Soon
-Any other shaders port will soon be implemented.
-
 
 ## 🛠️ Building from Source
 
@@ -97,8 +95,19 @@ open ShaderWallpaper.xcodeproj
 
 ```
 ShaderWallpaper/
-├── ShaderWallpaper.swift    # Main app logic and menu bar
-├── Shader.metal             # Metal shaders
+├── ShaderWallpaper.swift    # Main app entry point
+├── ShaderRenderer.swift    # Metal rendering and menu bar logic
+├── Shaders/
+│   ├── vertex.metal         # Vertex shader
+│   ├── common.metal         # Shared functions
+│   ├── balatro.metal        # Balatro shader
+│   ├── multibox.metal       # Multi Box shader
+│   ├── tile.metal           # Tiles shader
+│   ├── pilar.metal          # Pillars shader
+│   ├── marbel.metal         # Marbles shader
+│   ├── blackHoles.metal     # Black Hole shader
+│   ├── shiny.metal          # Shiny Color shader
+│   └── heavenly.metal       # Heavenly shader
 └── Info.plist              # App configuration
 ```
 
@@ -106,26 +115,33 @@ ShaderWallpaper/
 
 Want to add your own shaders? Here's how:
 
-1. **Add shader type** in `ShaderWallpaper.swift`:
+1. **Add shader type** in `ShaderRenderer.swift`:
 ```swift
 enum ShaderType: String, CaseIterable {
     case myShader = "My Custom Shader"
-    // ...
+    // Add case to shaderName switch...
 }
 ```
 
-2. **Write shader code** in `Shader.metal`:
+2. **Create shader file** in `Shaders/myShader.metal`:
 ```metal
+#include <metal_stdlib>
+#include "common.metal"
+#include "vertex.metal"
+
 fragment float4 myShader(VertexOut in [[stage_in]],
-                         constant float *uniforms [[buffer(0)]]) {
-    float iTime = uniforms[0];
-    float2 iResolution = float2(uniforms[1], uniforms[2]);
+                         constant Uniforms &uniforms [[buffer(0)]]) {
+    float2 uv = in.texCoord;
     // Your shader code here
     return float4(color, 1.0);
 }
 ```
 
-3. Rebuild and enjoy your custom effect!
+3. **Update ShaderRenderer.swift** to include your shader:
+   - Add `case myShader: return "myShader"` in the `shaderName` switch
+   - Add `.myShader` to the CaseIterable enum if needed
+
+4. Rebuild and enjoy your custom effect!
 
 ## 🐛 Troubleshooting
 
