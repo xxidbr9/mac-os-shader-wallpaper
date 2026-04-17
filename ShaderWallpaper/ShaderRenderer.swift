@@ -5,7 +5,6 @@
 //  Created by Barnando Akbarto on 21/01/26.
 //
 
-
 import Cocoa
 import MetalKit
 import SwiftUI
@@ -13,12 +12,32 @@ import SwiftUI
 // MARK: - Shader Type
 enum ShaderType: String, CaseIterable {
     case balatro = "Balatro (Original)"
+    case mulBox = "Multi Box"
+    case tile = "Tiles"
+    case pilar = "Pillars"
+    case marble = "Marbles"
+    case blackHole = "Black Hole"
+    case shiny = "Shiny Color"
+    case heavenly = "Heavenly"
     
     var shaderName: String {
         switch self {
         case .balatro: return "balatroShader"
+        case .mulBox: return "multiBoxShader"
+        case .tile: return "tileShader"
+        case .pilar: return "pilarShader"
+        case .marble: return "marbleShader"
+        case .blackHole: return "blackHoleShader"
+        case .shiny: return "shinyShader"
+        case .heavenly: return "heavenlyShader"
         }
     }
+}
+
+struct Uniforms {
+    var time: Float
+    var resolution: SIMD2<Float>
+    var mouse: SIMD4<Float>
 }
 
 // MARK: - Shader Renderer
@@ -83,13 +102,21 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
         renderEncoder.setRenderPipelineState(pipelineState)
         
         let time = Float(Date().timeIntervalSince(startTime))
-        var uniforms: [Float] = [
-            time,
-            Float(view.drawableSize.width),
-            Float(view.drawableSize.height)
-        ]
+        var uniforms = Uniforms(
+            time: time,
+            resolution: SIMD2(
+                Float(view.drawableSize.width),
+                Float(view.drawableSize.height)
+            ),
+            mouse: SIMD4(0,0,0,0)
+        )
         
-        renderEncoder.setFragmentBytes(&uniforms, length: MemoryLayout<Float>.stride * 3, index: 0)
+        renderEncoder.setFragmentBytes(
+            &uniforms,
+            length: MemoryLayout<Uniforms>.stride,
+            index: 0
+        )
+
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         renderEncoder.endEncoding()
         
@@ -136,6 +163,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         metalView = MTKView(frame: screenRect)
         metalView.autoresizingMask = [.width, .height]
+        metalView.drawableSize = CGSize(
+            width: screenRect.width * 0.5,
+            height: screenRect.height * 0.5
+        )
         
         renderer = ShaderRenderer(metalView: metalView)
         metalView.delegate = renderer

@@ -1,37 +1,14 @@
 //
-//  Shader.metal
+//  Shaders/balatro.metal
 //  ShaderWallpaper
 //
-//  Created by Barnando Akbarto on 21/01/26.
+//  Created by Barnando Akbarto on 17/04/26.
 //
+
 #include <metal_stdlib>
+#include "common.metal"
 using namespace metal;
 
-struct VertexOut {
-    float4 position [[position]];
-    float2 texCoord;
-};
-
-// Vertex shader - creates fullscreen quad
-vertex VertexOut vertexShader(uint vertexID [[vertex_id]]) {
-    VertexOut out;
-    
-    float2 positions[6] = {
-        float2(-1.0, -1.0),
-        float2( 1.0, -1.0),
-        float2(-1.0,  1.0),
-        float2(-1.0,  1.0),
-        float2( 1.0, -1.0),
-        float2( 1.0,  1.0)
-    };
-    
-    float2 pos = positions[vertexID];
-    out.position = float4(pos, 0.0, 1.0);
-    out.texCoord = (pos + 1.0) * 0.5;
-    out.texCoord.y = 1.0 - out.texCoord.y;
-    
-    return out;
-}
 
 // =============================================================================
 // SHADER 1: BALATRO (Original)
@@ -85,12 +62,10 @@ float4 balatroEffect(float2 screenSize, float2 screen_coords, float iTime) {
     return (0.3 / CONTRAST) * COLOUR_1 + (1.0 - 0.3 / CONTRAST) * (COLOUR_1 * c1p + COLOUR_2 * c2p + float4(c3p * COLOUR_3.rgb, c3p * COLOUR_1.a)) + light;
 }
 
-fragment float4 balatroShader(VertexOut in [[stage_in]],
-                              constant float *uniforms [[buffer(0)]]) {
-    float iTime = uniforms[0];
-    float2 iResolution = float2(uniforms[1], uniforms[2]);
-    float2 fragCoord = in.texCoord * iResolution;
-    
-    return balatroEffect(iResolution, fragCoord, iTime);
+fragment float4 balatroShader(
+    VertexOut in [[stage_in]],
+    constant Uniforms& u [[buffer(0)]]
+) {
+    float2 fragCoord = in.texCoord * u.resolution;
+    return balatroEffect(u.resolution, fragCoord, u.time);
 }
-
