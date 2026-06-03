@@ -6,7 +6,7 @@ A beautiful, GPU-accelerated live wallpaper for macOS with multiple shader effec
 
 ## ✨ Features
 
-- 🎨 **8 Built-in Shaders**: Switch between stunning visual effects
+- 🎨 **9 Built-in Shaders**: Switch between stunning visual effects
 - 🖱️ **Menu Bar Control** - Easy access to all features
 - 👁️ **Hide/Show Toggle** - Temporarily disable the wallpaper
 - ⚡ **GPU Accelerated** - Smooth 60 FPS using Metal
@@ -25,6 +25,7 @@ A beautiful, GPU-accelerated live wallpaper for macOS with multiple shader effec
 | Black Hole | ![Black Hole](.github/screenshots/blackhole.png) | Cosmic black hole effect with gravitational distortion | Custom |
 | Shiny Color | ![Shiny Color](.github/screenshots/shiny.png) | Vibrant shiny color gradients | Custom |
 | Heavenly | ![Heavenly](.github/screenshots/heavenly.png) | Ethereal heavenly glow effects | Custom |
+| Apple Logo | ![Apple Logo](.github/screenshots/applelogo.png) | Apple Logo with glass effects | Custom |
 
 ## 📥 Installation
 
