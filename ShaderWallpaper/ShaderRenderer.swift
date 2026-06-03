@@ -19,6 +19,7 @@ enum ShaderType: String, CaseIterable {
     case blackHole = "Black Hole"
     case shiny = "Shiny Color"
     case heavenly = "Heavenly"
+    case appleLogo = "Apple Logo"
     
     var shaderName: String {
         switch self {
@@ -30,6 +31,7 @@ enum ShaderType: String, CaseIterable {
         case .blackHole: return "blackHoleShader"
         case .shiny: return "shinyShader"
         case .heavenly: return "heavenlyShader"
+        case .appleLogo: return "appleLogoShader"
         }
     }
 
